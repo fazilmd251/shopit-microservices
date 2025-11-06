@@ -1,0 +1,35 @@
+{
+  "name": "seller-ui",
+  "projectType": "application",
+  "sourceRoot": "apps/seller-ui/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/seller-ui"
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "options": {
+        "buildTarget": "seller-ui:build",
+        "dev": true,
+        "port": 4300
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "seller-ui:build:production",
+          "dev": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/seller-ui/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  },
+  "tags": []
+}

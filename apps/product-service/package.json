@@ -1,0 +1,29 @@
+{
+  "name": "@shopit/product-service",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@shopit/product-service:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@shopit/product-service:build:development"
+          },
+          "production": {
+            "buildTarget": "@shopit/product-service:build:production"
+          }
+        }
+      }
+    }
+  }
+}
