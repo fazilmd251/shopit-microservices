@@ -191,7 +191,7 @@ export default function ProductDetails() {
                     }
                   `}
                 >
-                  {code.discountCode} {/* Display the code name */}
+                  {code.discountCode} {code.discountValue} {code.discountType=='percentage'?'%':'Rs'} {/* Display the code name */}
                 </button>
               );
             })}
