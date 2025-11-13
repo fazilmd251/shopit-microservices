@@ -69,7 +69,7 @@ export const loginUser = asyncError(async (req: Request, res: Response, next: Ne
     res.clearCookie("seller_access_token")
 
     //setting jwt token
-    const accessToken = jwt.sign({ id: user.id, role: "user" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "1d" })
+    const accessToken = jwt.sign({ id: user.id, role: "user" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "2d" })
     const refreshToken = jwt.sign({ id: user.id, role: "user" }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" })
 
 
@@ -270,7 +270,7 @@ export const loginSeller = asyncError(async (req: Request, res: Response, next: 
     res.clearCookie("access_token")
 
     //setting jwt token
-    const accessToken = jwt.sign({ id: seller.id, role: "seller" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "15m" })
+    const accessToken = jwt.sign({ id: seller.id, role: "seller" }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: "2d" })
     const refreshToken = jwt.sign({ id: seller.id, role: "seller" }, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: "7d" })
 
 

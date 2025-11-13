@@ -7,6 +7,6 @@ export const setCookie = (res: Response, name: string, value: string) => {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 1 * 24 * 60 * 60 * 1000 //7 days
+        maxAge: 2 * 24 * 60 * 60 * 1000 //2 days
     })
 }
