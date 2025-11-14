@@ -2,7 +2,7 @@ import { NotFoundError, ValidationError } from '@packages/errorHandler/errorHand
 import imageKit from '@packages/libs/imagekit/imageKit'
 import prisma from '@packages/libs/prisma/prisma'
 import asyncError from '@packages/middlewares/asyncError'
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, response, Response } from 'express'
 
 //Get categories
 export const getCategories = asyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -118,6 +118,15 @@ const response=await imageKit.upload({
 })
 
 if(!response)return 
-res.status(201).json({success:true,file_url:response.url,file_name:response.fileId})
+res.status(201).json({success:true,file_url:response.url,fileId:response.fileId})
+
+})
+
+export const deleteProductImage=asyncError(async (req:Request,res:Response,next:NextFunction)=>{
+const {fileId}=req.body
+const response =await imageKit.deleteFile(fileId)
+
+if(!response)return 
+res.status(201).json({success:true,response})
 
 })
