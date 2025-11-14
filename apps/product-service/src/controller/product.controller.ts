@@ -1,4 +1,5 @@
 import { NotFoundError, ValidationError } from '@packages/errorHandler/errorHandler'
+import imageKit from '@packages/libs/imagekit/imageKit'
 import prisma from '@packages/libs/prisma/prisma'
 import asyncError from '@packages/middlewares/asyncError'
 import { NextFunction, Request, Response } from 'express'
@@ -105,4 +106,18 @@ export const createProduct = asyncError(async (req: any, res: Response, next: Ne
         success: true,
         discount_code
     })
+})
+
+//upload product image
+export const uploadProductImage=asyncError(async (req:Request,res:Response,next:NextFunction)=>{
+const {fileName}=req.body
+const response=await imageKit.upload({
+    file:fileName,
+    fileName:`product-${Date.now()}.jpg`,
+    folder:'/products'
+})
+
+if(!response)return 
+res.status(201).json({success:true,file_url:response.url,file_name:response.fileId})
+
 })

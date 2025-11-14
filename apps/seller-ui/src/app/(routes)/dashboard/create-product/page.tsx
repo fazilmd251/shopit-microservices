@@ -18,10 +18,10 @@ export default function CreateProduct() {
     getValues,
   } = useForm();
 
-  // useEffect(() => {
-  //   register("images", { required: "At least one image is required" });
-  //   register("sizes", { required: "At least one size is required" });
-  // }, [register]);
+  useEffect(() => {
+    register("images", { required: "At least one image is required" });
+    register("sizes", { required: "At least one size is required" });
+  }, [register]);
   const methods = useForm({ defaultValues: { /* ... */ } });
   const onSubmit = (data: any) => { console.log(data); };
 
@@ -33,7 +33,10 @@ export default function CreateProduct() {
 
   const convertBasse64=(file:File)=>{
 return new Promise((resolve,reject)=>{
-  //const reader
+  const reader=new FileReader()
+  reader.readAsDataURL(file)
+  reader.onload=()=>resolve(reader.result)
+  reader.onerror=(err)=>reject(err)
 })
   }
 
@@ -41,32 +44,38 @@ return new Promise((resolve,reject)=>{
     if(!file)return
     try {
       const base64=await convertFileToBase64(file)
+      const res=await axiosInstanceForProducts.post('/api/upload-product-image',{fileName:base64})
+       const updatedImages=[...images]
+       updatedImages[index]=res.data?.file_url
+       if(index===images.length-1&&updatedImages.length<8){
+        updatedImages.push(null)
+       }
+       setImages(updatedImages)
+       setValue('images',updatedImages)
+       console.log(res.data?.file_url)
+       console.log(res.data?.file_name)
     } catch (error) {
-      
-    }
-    const updatedImages = [...images]
-    updatedImages[index] = file
-    if (index === images.length - 1 && images.length < 8) {
-      updatedImages.push(null)
-      setImages(updatedImages)
-      setValue('images', updatedImages)
+      console.log(error)
     }
   }
   const handleRemoveChange = (index: number) => {
-    setImages((prevImages) => {
-      const updatedImages = [...prevImages];
-      if (index === -1) {
-        updatedImages[0] = null;
-      } else {
-        updatedImages.splice(index, 1);
+    try {
+      const updatedImages=[...images]
+      const imageToDelete=updatedImages[index]
+      if(imageToDelete&&typeof imageToDelete==='string'){
+        //delete our pic
       }
-      if (!updatedImages.includes(null) && updatedImages.length < 8) {
-        updatedImages.push(null);
+      updatedImages.slice(index,1)
+
+      //add null placeholder
+      if(!updatedImages.includes(null)&&updatedImages.length<8){
+        updatedImages.push(null)
       }
-      // update the form value with the new images array and always return the array
-      setValue('images', updatedImages);
-      return updatedImages;
-    });
+      setImages(updatedImages)
+      setValue('images',updatedImages)
+    } catch (error) {
+      console.log(error)
+    }
   }
   //const handleImagesChange = (files: File) => setUploadedFiles(files);
 
