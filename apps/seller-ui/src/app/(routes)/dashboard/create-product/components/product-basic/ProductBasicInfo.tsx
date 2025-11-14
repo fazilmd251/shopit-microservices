@@ -4,18 +4,20 @@ import { useQuery } from "@tanstack/react-query";
 import axiosInstanceForProducts from "apps/seller-ui/src/app/utils/axiosInstanceForProduct";
 import { MultipleImageUpload } from "../multiple-image/MultipleImage";
 import { SingleImageUpload } from "../single-image/SingleImageModal";
-import { Testing } from "../multiple-image/Testing";
+import ImagePlaceHolder from "../multiple-image/ImagePlaceHolder";
+import PlaceHolder from "../multiple-image/PlaceHolder";
+//import { Testing } from "../multiple-image/Testing";
 
 
 const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "Free Size"];
 
 interface ProductBasicInfoProps {
-  images: string[];
-  handleFilesSelected: (files: File[]) => void;
-  handleImageChange: (files: File[]) => void;
-  handleRemoveImage: (url: string) => void;
+  // images: string[];
+  // handleFilesSelected: (files: File[]) => void;
+  // handleImageChange: (files: File[]) => void;
+  // handleRemoveImage: (url: string) => void;
 }
-const ProductBasicInfo: React.FC<ProductBasicInfoProps> = ({ handleFilesSelected,images ,handleRemoveImage,handleImageChange}) => {
+const ProductBasicInfo: React.FC<ProductBasicInfoProps> = () => {
   const {
     register,
     formState: { errors },
@@ -66,18 +68,6 @@ const ProductBasicInfo: React.FC<ProductBasicInfoProps> = ({ handleFilesSelected
 
   return (
     <>
-      <label className="font-semibold text-sm">Product Images</label>
-          {/* <MultipleImageUpload
-        onFilesChange={handleFilesSelected}
-        imageUrls={images}
-        onRemoveImage={handleRemoveImage}
-      /> */}
-      <Testing onImagesChange={handleImageChange} />
-      {/* <SingleImageUpload onImageChange={handleMainImageChange}/> */}
-      {errors.images && (
-        <p className="text-xs text-red-500">{String(errors.images.message)}</p>
-      )}
-
       <div className="grid grid-cols-1 gap-2 text-sm mt-4">
         <div>
           <label>Product Title</label>

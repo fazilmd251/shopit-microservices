@@ -1,77 +1,111 @@
 "use client";
-import React, { useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import ProductBasicInfo from "./components/product-basic/ProductBasicInfo";
 import ProductDetails from "./components/product-details/ProductDetails";
 import axiosInstanceForProducts from "../../../utils/axiosInstanceForProduct";
 import convertFileToBase64 from "../../../utils/convertToBase64";
+import PlaceHolder from "./components/multiple-image/PlaceHolder";
 
 
 export default function CreateProduct() {
+  const {
+    register,
+    formState: { errors },
+    control,
+    setValue,
+    clearErrors,
+    getValues,
+  } = useForm();
+
+  // useEffect(() => {
+  //   register("images", { required: "At least one image is required" });
+  //   register("sizes", { required: "At least one size is required" });
+  // }, [register]);
   const methods = useForm({ defaultValues: { /* ... */ } });
   const onSubmit = (data: any) => { console.log(data); };
-  
 
-  // images array holds URLs returned by backend
-  const [images, setImages] = useState<string[]>([]);
-
-  // Upload a single file as base64 to backend, get URL in response
-  const uploadImageToBackend = async (base64: string): Promise<string> => {
-    try {
-      const response = await axiosInstanceForProducts.post("/api/upload-product-image", { data: base64 });
-      return response.data.url; // backend returns image URL (adjust as needed)
-    } catch (error) {
-      console.error("Upload failed", error);
-      throw error;
-    }
-  };
-
-  // Delete image on backend via URL or ID
-  const deleteImageOnBackend = async (imageUrl: string): Promise<void> => {
-    try {
-      await axiosInstanceForProducts.post("/api/delete-image", { url: imageUrl });
-    } catch (error) {
-      console.error("Delete failed", error);
-      throw error;
-    }
-  };
-
-  // Called by MultipleImageUpload when user selects files
-  const handleFilesSelected = async (files: File[]) => {
-    for (const file of files) {
-      try {
-        const base64 = await convertFileToBase64(file);
-        const uploadedUrl = await uploadImageToBackend(base64);
-        setImages((prev) => [...prev, uploadedUrl]);
-      } catch (error) {
-        // Handle upload error, e.g., show toast
-      }
-    }
-  };
-
-  // Called by remove button with URL to delete
-  const handleRemoveImage = async (urlToRemove: string) => {
-    try {
-      await deleteImageOnBackend(urlToRemove);
-      setImages((prev) => prev.filter((url) => url !== urlToRemove));
-    } catch (error) {
-      // Handle delete error, e.g., show toast
-    }
-  };
-
+  const [openImageModal, setOpenImageModal] = useState<boolean>(false)
+  const [isChanged, setIsChanged] = useState<boolean>(false)
+  const [images, setImages] = useState<(File | null)[]>([null])
+  const [loading, setLoading] = useState<boolean>(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
- 
-  const handleImagesChange = (files: File[]) => setUploadedFiles(files);
+  const convertBasse64=(file:File)=>{
+return new Promise((resolve,reject)=>{
+  //const reader
+})
+  }
 
- 
+  const handleImageChange = async(file: File | null, index: number) => {
+    if(!file)return
+    try {
+      const base64=await convertFileToBase64(file)
+    } catch (error) {
+      
+    }
+    const updatedImages = [...images]
+    updatedImages[index] = file
+    if (index === images.length - 1 && images.length < 8) {
+      updatedImages.push(null)
+      setImages(updatedImages)
+      setValue('images', updatedImages)
+    }
+  }
+  const handleRemoveChange = (index: number) => {
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      if (index === -1) {
+        updatedImages[0] = null;
+      } else {
+        updatedImages.splice(index, 1);
+      }
+      if (!updatedImages.includes(null) && updatedImages.length < 8) {
+        updatedImages.push(null);
+      }
+      // update the form value with the new images array and always return the array
+      setValue('images', updatedImages);
+      return updatedImages;
+    });
+  }
+  //const handleImagesChange = (files: File) => setUploadedFiles(files);
+
+
 
   return (
     <div className="p-6 text-gray-200 min-h-screen bg-gray-950">
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)} className="flex flex-col lg:flex-row gap-6">
           <div className="w-full lg:w-96 bg-gray-900/60 border border-gray-700 rounded-xl p-4 flex flex-col space-y-4">
-            <ProductBasicInfo handleImageChange={handleImagesChange} handleRemoveImage={handleRemoveImage} handleFilesSelected={handleFilesSelected} images={images} />
+   <div className="relative w-full max-w-full bg-gray-900 rounded-lg border border-gray-700 p-4">
+    <div>
+      <label className="font-semibold text-sm">Product Images</label>
+           {images.length>0&& (<PlaceHolder
+              setOpenImageModal={setOpenImageModal}
+              index={0}
+              onImageChange={handleImageChange}
+              onRemove={handleRemoveChange}
+            />)}
+    </div>
+      <div className=" w-full  flex-shrink-0 grid  grid-cols-3 gap-2  rounded-md  p-1">   
+       {
+       images.slice(1).map((_:any,index:number)=>(
+        <PlaceHolder small key={index}
+        setOpenImageModal={setOpenImageModal}
+              index={index+1}
+              onImageChange={handleImageChange}
+              onRemove={handleRemoveChange}
+
+        />
+        ))
+       }
+      </div> 
+    </div>     
+     
+            {/* {errors.images && (
+        <p className="text-xs text-red-500">{String(errors.images.message)}</p>
+      )} */}
+            <ProductBasicInfo />
           </div>
           <div className="flex-1 bg-gray-900/60 border border-gray-700 rounded-xl p-5 flex flex-col">
             <ProductDetails />
@@ -87,3 +121,46 @@ export default function CreateProduct() {
   );
 }
 
+// // Upload a single file as base64 to backend, get URL in response
+// const uploadImageToBackend = async (base64: string): Promise<string> => {
+//   try {
+//     const response = await axiosInstanceForProducts.post("/api/upload-product-image", { data: base64 });
+//     return response.data.url; // backend returns image URL (adjust as needed)
+//   } catch (error) {
+//     console.error("Upload failed", error);
+//     throw error;
+//   }
+// };
+
+// // Delete image on backend via URL or ID
+// const deleteImageOnBackend = async (imageUrl: string): Promise<void> => {
+//   try {
+//     await axiosInstanceForProducts.post("/api/delete-image", { url: imageUrl });
+//   } catch (error) {
+//     console.error("Delete failed", error);
+//     throw error;
+//   }
+// };
+
+// // Called by MultipleImageUpload when user selects files
+// const handleFilesSelected = async (files: File[]) => {
+//   for (const file of files) {
+//     try {
+//       const base64 = await convertFileToBase64(file);
+//       const uploadedUrl = await uploadImageToBackend(base64);
+//       setImages((prev) => [...prev, uploadedUrl]);
+//     } catch (error) {
+//       // Handle upload error, e.g., show toast
+//     }
+//   }
+// };
+
+// // Called by remove button with URL to delete
+// const handleRemoveImage = async (urlToRemove: string) => {
+//   try {
+//     await deleteImageOnBackend(urlToRemove);
+//     setImages((prev) => prev.filter((url) => url !== urlToRemove));
+//   } catch (error) {
+//     // Handle delete error, e.g., show toast
+//   }
+// };
