@@ -3,6 +3,7 @@ import * as path from 'path';
 //import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import proxy from 'express-http-proxy';
+import bodyParser from 'body-parser'
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 //import swaggerUi from 'swagger-ui-express'
@@ -18,6 +19,10 @@ app.use(cors({
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true
 }))
+
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 
 app.use(morgan("dev"))
 app.use(express.json({ limit: "70mb" }))
