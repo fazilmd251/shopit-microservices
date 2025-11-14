@@ -40,9 +40,28 @@ export default function CreateProduct() {
   // 1. Use 'useForm' ONCE and store all methods in a single object.
   const methods = useForm<IProductForm>({
     defaultValues: {
+     defaultValues: {
       images: [],
       sizes: [],
-      // ... other default values
+      title: "",
+      category: "",
+      subCategory: "",
+      regularPrice: 0,
+      salePrice: undefined,
+      stock: 0,
+      shortDescription: "",
+      description: "",
+      tags: "",
+      warranty: "",
+      slug: "",
+      brand: "",
+      videoUrl: "",
+      cashOnDelivery: "true",
+      colors: [],
+      specifications: [],
+      customProperties: [],
+      discountCodes: [],
+    },
     },
   });
 
@@ -58,7 +77,7 @@ export default function CreateProduct() {
   // 'sizes' is now registered in ProductBasicInfo.
   useEffect(() => {
     register("images", { 
-      validate: (value) => value.filter(Boolean).length > 0 || "At least one image is required"
+     validate: (value) => (value && value.length > 0) || "At least one image is required"
     });
   }, [register]);
 

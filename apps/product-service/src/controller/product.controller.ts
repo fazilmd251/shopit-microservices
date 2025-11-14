@@ -84,28 +84,31 @@ export const deleteDiscountCodes = asyncError(async (req: Request, res: Response
 
 //create product 
 export const createProduct = asyncError(async (req: any, res: Response, next: NextFunction) => {
-    const { public_name, discountType, discountValue, discountCode } = req.body
+    // const {
+    //     title,
+    //     category,
+    //     subCategory,
+    //     regularPrice,
+    //     salePrice,
+    //     stock,
+    //     shortDescription,
+    //     description,
+    //     tags,
+    //     warranty,
+    //     slug,
+    //     brand,
+    //     videoUrl,
+    //     cashOnDelivery,
+    //     color,            // <-- See Note 1 below
+    //     sizes,
+    //     specifications,
+    //     images,
+    //     properties,     // <-- See Note 2 below
+    //     discountCodes
+    // } = req.body;
 
 
-    if (!public_name || !discountType || !discountValue || !discountCode)
-        throw new ValidationError("All the fields are required")
 
-    const isDiscountCodeExists = await prisma.discount_codes.findUnique({ where: { discountCode } })
-
-    if (isDiscountCodeExists)
-        throw new ValidationError("Discount code already availible Please use different one")
-
-    const discount_code = await prisma.discount_codes.create({
-        data: {
-            public_name, discountType,
-            discountValue: parseFloat(discountValue),
-            discountCode, sellerId: req.seller?.id
-        }
-    })
-    return res.status(200).json({
-        success: true,
-        discount_code
-    })
 })
 
 //upload product image

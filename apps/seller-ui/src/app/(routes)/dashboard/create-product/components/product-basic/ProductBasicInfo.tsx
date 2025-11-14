@@ -1,9 +1,8 @@
+// 3rd file - ProductBasicInfo.tsx (Corrected)
 import { useFormContext, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstanceForProducts from "apps/seller-ui/src/app/utils/axiosInstanceForProduct";
-// ... other imports
-// Removed unused image imports
 
 const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "Free Size"];
 
@@ -19,8 +18,6 @@ const ProductBasicInfo: React.FC<ProductBasicInfoProps> = () => {
     getValues,
   } = useFormContext(); // Correctly gets context from FormProvider
 
-  // 1. This 'useEffect' now ONLY registers 'sizes'.
-  // 'images' is registered in the parent CreateProduct component.
   useEffect(() => {
     register("sizes", { required: "At least one size is required" });
   }, [register]);
@@ -40,7 +37,7 @@ const ProductBasicInfo: React.FC<ProductBasicInfoProps> = () => {
   });
 
   const categories = data?.categories || [];
-  const subCategories = data?.subcategories || {};
+  const subCategories = data?.subCategories || {};
 
   const selectedCategory = useWatch({ control, name: "category" });
   const selectedSizes = useWatch({ control, name: "sizes", defaultValue: [] });
@@ -60,8 +57,6 @@ const ProductBasicInfo: React.FC<ProductBasicInfoProps> = () => {
   return (
     <>
       <div className="grid grid-cols-1 gap-2 text-sm mt-4">
-        {/* ... (all your input fields for title, category, etc. remain the same) ... */}
-        
         {/* Product Title */}
         <div>
           <label>Product Title</label>
@@ -141,8 +136,67 @@ const ProductBasicInfo: React.FC<ProductBasicInfoProps> = () => {
             <p className="text-xs text-red-500 mt-1">{String(errors.sizes.message)}</p>
           )}
         </div>
+
+        {/* --- I HAVE ADDED THESE BACK --- */}
+
+        {/* Regular Price */}
+        <div>
+          <label>Regular Price</label>
+          <input
+            type="number"
+            {...register("regularPrice", {
+              required: "Regular price is required",
+              valueAsNumber: true,
+              min: { value: 0, message: "Price must be 0 or more" },
+            })}
+            className="w-full bg-gray-800 text-gray-200 border border-gray-700 px-2 py-1 rounded-sm text-xs"
+          />
+          {errors.regularPrice && (
+            <p className="text-xs text-red-500">{String(errors.regularPrice.message)}</p>
+          )}
+        </div>
+
+        {/* Sale Price (Optional) */}
+        <div>
+          <label>Sale Price (Optional)</label>
+          <input
+            type="number"
+            {...register("salePrice", {
+              valueAsNumber: true,
+              min: { value: 0, message: "Price must be 0 or more" },
+              validate: (salePrice) => {
+                const regularPrice = getValues("regularPrice");
+                if (salePrice && regularPrice) {
+                  return salePrice < regularPrice || "Sale price must be less than regular price";
+                }
+                return true;
+              },
+            })}
+            className="w-full bg-gray-800 text-gray-200 border border-gray-700 px-2 py-1 rounded-sm text-xs"
+          />
+          {errors.salePrice && (
+            <p className="text-xs text-red-500">{String(errors.salePrice.message)}</p>
+          )}
+        </div>
+
+        {/* Stock */}
+        <div>
+          <label>Stock</label>
+          <input
+            type="number"
+            {...register("stock", {
+              required: "Stock quantity is required",
+              valueAsNumber: true,
+              min: { value: 0, message: "Stock cannot be negative" },
+            })}
+            className="w-full bg-gray-800 text-gray-200 border border-gray-700 px-2 py-1 rounded-sm text-xs"
+          />
+          {errors.stock && (
+            <p className="text-xs text-red-500">{String(errors.stock.message)}</p>
+          )}
+        </div>
         
-        {/* ... (Regular Price, Sale Price, Stock inputs) ... */}
+        {/* --- END OF ADDED FIELDS --- */}
 
       </div>
     </>
