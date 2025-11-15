@@ -8,6 +8,8 @@ import { headers } from 'next/headers'
 import {Toaster} from 'react-hot-toast'
 import DiscountCodes from './discount-codes/page'
 import Products from './all-products/Products'
+import { ChevronRight, Plus, Search } from 'lucide-react'
+import Link from 'next/link'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const searchParams = useSearchParams()
@@ -16,6 +18,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const route = searchParams.get('page') || 'overview'
 
   const hideHeader:string[]=['create-product']
+  // 1. The state is "lifted up" and now lives in the parent
+    const [globalFilter, setGlobalFilter] = useState("");//from products
 
   return (
     <><Toaster/>
@@ -27,7 +31,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header fixed */}
       <header className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm p-6 border-b border-gray-800">
-          <Header route={route} collapsed={collapsed} setIsModalOpen={setIsModalOpenDiscount} isModalOpen={isModalOpenDiscount}/>
+          <Header globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} route={route} collapsed={collapsed} setIsModalOpen={setIsModalOpenDiscount} isModalOpen={isModalOpenDiscount}/>
         </header>
 
         {/* Scrollable main content */}
@@ -42,7 +46,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             >
               {route === 'overview' && <Overview />}
               {route === 'orders' && <Orders />}
-              {route === 'products' && <Products />}
+              {route === 'products' && <Products globalFilter={globalFilter} setGlobalFilter={setGlobalFilter}/>}
               {route === 'analytics' && <Analytics />}
               {route === 'settings' && <Settings />}
               {route === 'create-product' && <CreateProduct />}
@@ -62,7 +66,8 @@ export default Layout
 
 
 
-function Header({ collapsed ,route,isModalOpen, setIsModalOpen}:{isModalOpen:boolean, setIsModalOpen:any,collapsed:boolean,route:string}) {
+function Header({ collapsed ,route,isModalOpen, setIsModalOpen,globalFilter,setGlobalFilter}:
+  {isModalOpen:boolean, setIsModalOpen:any,collapsed:boolean,route:string,globalFilter:any,setGlobalFilter:any}) {
   return (
     <>
     {route==='create-product'&&(
@@ -79,8 +84,7 @@ function Header({ collapsed ,route,isModalOpen, setIsModalOpen}:{isModalOpen:boo
         </div>
         <div className="w-10 h-10 rounded-md bg-gray-800/70 flex items-center justify-center text-xl">🔔</div>
       </div>)}
-      {
-        route==='discount-codes'&&(<div className="flex items-center justify-between">
+      { route==='discount-codes'&&(<div className="flex items-center justify-between">
           {/* Left Side: Title and Breadcrumbs */}
           <div>
             <h1 className="text-2xl font-semibold text-white">Discount Codes</h1>
@@ -104,8 +108,44 @@ function Header({ collapsed ,route,isModalOpen, setIsModalOpen}:{isModalOpen:boo
           </div>
         </div>)
       }
+      {route==='products'&&(<>
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      
+                          {/* Left Side: Title and Breadcrumbs */}
+                          <div>
+                              <h1 className="text-2xl font-bold text-white">Products</h1>
+                              <div className="flex items-center gap-1 text-sm text-slate-400 mt-1">
+                                  <Link href="/dashboard" className="hover:text-indigo-400 transition-colors">
+                                      Dashboard
+                                  </Link>
+                                  <ChevronRight size={16} className="text-slate-600" />
+                                  <span className="text-indigo-400 font-medium">Products</span>
+                              </div>
+                          </div>
+      
+                          {/* Right Side: Actions (Search + Add) */}
+                          <div className="flex items-center gap-3">
+                              {/* Search Input */}
+                              <div className="relative">
+                                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                                  <input
+                                      value={globalFilter}
+                                      onChange={e => setGlobalFilter(e.target.value)}
+                                      placeholder="Search products..."
+                                      className="h-10 w-full rounded-lg border border-slate-800 bg-slate-950 pl-10 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 md:w-64"
+                                  />
+                              </div>
+      
+                              {/* Add Button */}
+                              <button className="flex h-10 items-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white hover:bg-indigo-500 transition-colors">
+                                  <Plus size={16} />
+                                  <span>Add Product</span>
+                              </button>
+                          </div>
+                      </div>
+      </>)}
     
-    {route!=='create-product'&&route!=='discount-codes'&&(<div className="flex items-center justify-between">
+    {/* {route!=='create-product'&&route!=='discount-codes'&&(<div className="flex items-center justify-between">
       <div>
         <h1 className="text-2xl font-semibold">Welcome back, Mohamed</h1>
         <p className="text-sm text-gray-400">Here's what's happening with your store today.</p>
@@ -114,7 +154,8 @@ function Header({ collapsed ,route,isModalOpen, setIsModalOpen}:{isModalOpen:boo
         <button className="px-3 py-2 bg-white/6 rounded-md text-sm">New product</button>
         <div className="w-10 h-10 rounded-md bg-gray-800/60 flex items-center justify-center">🔔</div>
       </div>
-    </div>)}
+    </div>)} */}
+
     </>
   )
 }

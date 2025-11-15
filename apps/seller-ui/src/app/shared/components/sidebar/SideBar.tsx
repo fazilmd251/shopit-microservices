@@ -33,7 +33,7 @@ const navItems = useMemo(() => [
     { id: 'overview', label: 'Overview', icon: IconHome },
     { id: 'orders', label: 'Orders', icon: IconOrders },
     { id: 'payments', label: 'Payments', icon: IconPayments },
-    { id: 'all-products', label: 'All Products', icon: IconProducts },
+    { id: 'products', label: 'All Products', icon: IconProducts },
     { id: 'create-product', label: 'Create Product', icon: IconCreateProduct },
     { id: 'create-event', label: 'Create Event', icon: IconCreateEvent },
     { id: 'all-events', label: 'All Events', icon: IconEvents },
