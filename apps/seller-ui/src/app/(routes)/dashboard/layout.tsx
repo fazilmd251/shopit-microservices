@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import CreateProduct from './create-product/page'
 import { headers } from 'next/headers'
+import {Toaster} from 'react-hot-toast'
 import DiscountCodes from './discount-codes/page'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -16,6 +17,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const hideHeader:string[]=['create-product']
 
   return (
+    <><Toaster/>
     <div className="min-h-screen bg-gray-900 text-gray-100 flex">
       {/* Sidebar */}
       <SideBar collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -49,6 +51,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </main>
       </div>
     </div>
+    </>
   )
 }
 

@@ -8,6 +8,8 @@ import convertFileToBase64 from "../../../utils/convertToBase64"; // Using the i
 import PlaceHolder from "./components/multiple-image/PlaceHolder";
 import { Wand, X } from "lucide-react";
 import enhancements from "../../../utils/ai-enhancements/aiEnhancements";
+import { useRouter } from "next/navigation";
+import { toast } from 'react-hot-toast'
 
 interface UploadedImage {
   file_url: string;
@@ -40,7 +42,6 @@ export default function CreateProduct() {
   // 1. Use 'useForm' ONCE and store all methods in a single object.
   const methods = useForm<IProductForm>({
     defaultValues: {
-     defaultValues: {
       images: [],
       sizes: [],
       title: "",
@@ -62,7 +63,6 @@ export default function CreateProduct() {
       customProperties: [],
       discountCodes: [],
     },
-    },
   });
 
   // 2. Destructure all necessary methods from the 'methods' object.
@@ -73,27 +73,40 @@ export default function CreateProduct() {
     handleSubmit,
   } = methods;
 
+    const [openImageModal, setOpenImageModal] = useState<boolean>(false);
+  const [images, setImages] = useState<(UploadedImage | null)[]>([null]); // This local state drives the UI
+  const [selectedImage, setSelectedImage] = useState("");
+
+  // 4. Changed 'pictureUploadingLoader' to 'uploadingIndex' for better control
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [activeEffect, setActiveEffect] = useState<string>("");
+
   // 3. Register only the fields managed by THIS component.
   // 'sizes' is now registered in ProductBasicInfo.
   useEffect(() => {
-    register("images", { 
-     validate: (value) => (value && value.length > 0) || "At least one image is required"
+    register("images", {
+      validate: (value) => (value && value.length > 0) || "At least one image is required"
     });
   }, [register]);
 
-  const onSubmit = (data: any) => {
+  const router = useRouter()
+
+  const onSubmit = async (data: any) => {
     console.log(data);
+    setLoading(true)
+    try {
+      await axiosInstanceForProducts.post('/api/create-product', data)
+      router.push('/dashboard?page=products')
+    } catch (error: any) {
+      console.log(error)
+      toast.error(error?.data?.message)
+    }finally{setLoading(false)}
   };
 
-  const [openImageModal, setOpenImageModal] = useState<boolean>(false);
-  const [images, setImages] = useState<(UploadedImage | null)[]>([null]); // This local state drives the UI
-  const [selectedImage, setSelectedImage] = useState("");
-  
-  // 4. Changed 'pictureUploadingLoader' to 'uploadingIndex' for better control
-  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
-  
-  const [processing, setProcessing] = useState<boolean>(false);
-  const [activeEffect, setActiveEffect] = useState<string>("");
+
 
   // 5. Removed the duplicate 'convertFileToBase64' function.
 
@@ -117,7 +130,7 @@ export default function CreateProduct() {
       }
       setImages(updatedImages);
       // 6. Update the form value with the non-null images
-      setValue("images", updatedImages.filter(Boolean), { shouldValidate: true });
+      setValue("images", updatedImages.filter((img): img is UploadedImage => img !== null), { shouldValidate: true });
     } catch (error) {
       console.log(error);
     } finally {
@@ -143,7 +156,7 @@ export default function CreateProduct() {
       setImages(updatedImages);
 
       // 7. Update the form value
-      setValue("images", updatedImages.filter(Boolean), { shouldValidate: true });
+      setValue("images", updatedImages.filter((img): img is UploadedImage => img !== null), { shouldValidate: true });
     } catch (error) {
       console.log(error);
     }
@@ -224,7 +237,7 @@ export default function CreateProduct() {
 
             {/* Display error for images */}
             {errors.images && (
-             <p className="text-xs text-red-500">{String(errors.images.message)}</p>
+              <p className="text-xs text-red-500">{String(errors.images.message)}</p>
             )}
             <ProductBasicInfo />
           </div>
@@ -232,7 +245,7 @@ export default function CreateProduct() {
             <ProductDetails />
             <div className="mt-6 flex justify-end">
               <button
-                type="submit"
+                type="submit" disabled={loading}
                 className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-sm text-white text-sm transition"
               >
                 Create Product
@@ -241,7 +254,7 @@ export default function CreateProduct() {
           </div>
         </form>
       </FormProvider>
-      
+
       {openImageModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-60 z-50">
           <div className="bg-gray-800 p-6 rounded-lg w-[450px] text-white">
@@ -285,4 +298,3 @@ export default function CreateProduct() {
 }
 
 
- 

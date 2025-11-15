@@ -82,40 +82,70 @@ export const deleteDiscountCodes = asyncError(async (req: Request, res: Response
 })
 
 
-//create product 
+// Create product controller with validation
 export const createProduct = asyncError(async (req: any, res: Response, next: NextFunction) => {
     const {
-        title,
-        category,
-        subCategory,
-        regularPrice,
-        salesPrice,
-        stock,
-        shortDescription,
-        description,
-        tags,
-        warranty,
-        slug,
-        brand,
-        videoUrl,
-        cashOnDelivery,
-        color,            // <-- See Note 1 below
-        sizes,
-        customSpecifications,
-        images,shopId,
-        customProperties,     // <-- See Note 2 below
-        discountCodes
+        title, category, subCategory, regularPrice, salesPrice, stock,
+        shortDescription, description, tags, warranty, slug, brand, videoUrl,
+        cashOnDelivery, color, sizes, specifications, images,
+        properties, discountCodes
     } = req.body;
+    const shopId = req.seller?.shop?.id;
 
-    if (!title || !slug || !category || !stock || !tags || !images ||!tags||!sizes||
-        !subCategory || !regularPrice || !salesPrice || !description||!shopId){
-        throw new ValidationError("All fields are required")}
+    if (!title || !slug || !category || !stock || !tags || !images || !sizes ||
+        !subCategory || !regularPrice || !salesPrice || !description || !shopId) {
+        throw new ValidationError("All fields are required");
+    }
 
-        const newProduct=await prisma.product.create({
-            data:{title ,slug , category ,stock , tags ,sizes,color,discountCodes,shopId, images,subCategory ,regularPrice,salesPrice ,description,shortDescription}
-        })
+    const newProduct = await prisma.product.create({
+        data: {
+            title,
+            slug,
+            category,
+            stock: parseInt(stock),
+            sizes: sizes || [],
+            tags: Array.isArray(tags) ? tags : tags.split(","),
+            description,
+            videoUrl,
+            color: color || [],
+            shopId,
+            subCategory,
+            discountCodes: discountCodes ? discountCodes.map((c: any) => c) : [],
+            cashOnDelivery,
+            regularPrice: parseFloat(regularPrice),
+            salesPrice: parseFloat(salesPrice),
+            shortDescription,
+            brand,
+            warranty,
+            customProperties: properties || {},
+            customSpecifications: specifications || [],
+            images: images && Array.isArray(images) && images.length > 0
+                ? {
+                    create: images.filter((img: any) => img && img.fileId && img.file_url)
+                        .map((i: any) => ({
+                            file_id: i.fileId,
+                            file_url: i.file_url
+                        }))
+                }
+                : undefined,
+        },
+        include: { images: true }
+    });
 
+    if (!newProduct) throw new NotFoundError("Product creation failed");
+
+    res.status(200).json({ success: true, newProduct });
+});
+
+export const getProducts = asyncError(async (req: any, res: Response, next: NextFunction) => {
+const products:any=await prisma.product.findMany({
+where:{shopId:req.seller?.shop.id},include:{images:true}
 })
+    if (!products&&products.length<1) throw new NotFoundError("Products Not found ");
+
+    res.status(200).json({ success: true, products });
+});
+
 
 //upload product image
 export const uploadProductImage = asyncError(async (req: Request, res: Response, next: NextFunction) => {

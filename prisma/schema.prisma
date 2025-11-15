@@ -10,7 +10,7 @@ datasource db {
 model images {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   file_id   String
-  url       String
+  file_url       String
   userId    String?  @unique @db.ObjectId
   user      users?   @relation(fields: [userId], references: [id])
   shopId    String?  @unique @db.ObjectId
@@ -119,7 +119,7 @@ model product {
   category             String
   subCategory          String
   regularPrice         Float
-  tags                 String?
+  tags                 String[]
   warranty             String?
   ratings              Float?
   brand                String?
@@ -128,7 +128,7 @@ model product {
   sizes                String[]
   color                String[]
   discountCodes        String[]      @db.ObjectId
-  customSpecifications Json?
+  customSpecifications Json[]
   customProperties     Json?
   startingDate         DateTime?
   endingDate           DateTime?
