@@ -7,6 +7,7 @@ import CreateProduct from './create-product/page'
 import { headers } from 'next/headers'
 import {Toaster} from 'react-hot-toast'
 import DiscountCodes from './discount-codes/page'
+import Products from './all-products/Products'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const searchParams = useSearchParams()
@@ -164,29 +165,7 @@ function Orders() {
   )
 }
 
-function Products() {
-  return (
-    <div>
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Products</h2>
-        <div className="flex items-center gap-2">
-          <input placeholder="Search product" className="px-3 py-2 rounded-md bg-gray-900/60 border border-gray-800 text-sm" />
-          <button className="px-3 py-2 rounded-md bg-indigo-600 text-sm">Add</button>
-        </div>
-      </div>
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="p-4 bg-gray-800/40 rounded-lg">
-            <div className="h-36 bg-gray-700 rounded-md mb-3 flex items-center justify-center">Image</div>
-            <div className="text-sm font-medium">Product #{i + 1}</div>
-            <div className="text-xs text-gray-400">${(25 + i * 7).toFixed(2)}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function Analytics() {
   return (
