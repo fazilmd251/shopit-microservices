@@ -49,7 +49,7 @@ export const getDiscountCodes = asyncError(async (req: Request, res: Response, n
     const discount_codes = await prisma.discount_codes.findMany({
         where: { sellerId: req.seller?.id }
     })
-    if(!discount_codes||discount_codes.length<1)
+    if (!discount_codes || discount_codes.length < 1)
         throw new NotFoundError("Discount code not availibe! Add discount code ")
 
     return res.status(200).json({
@@ -73,63 +73,69 @@ export const deleteDiscountCodes = asyncError(async (req: Request, res: Response
     if (discount_code.sellerId !== sellerId)
         throw new ValidationError("Unauthourized access")
 
-    await prisma.discount_codes.delete({where:{id}})
+    await prisma.discount_codes.delete({ where: { id } })
 
     return res.status(200).json({
         success: true,
-        message:"Discount code deleted succesfully "
+        message: "Discount code deleted succesfully "
     })
 })
 
 
 //create product 
 export const createProduct = asyncError(async (req: any, res: Response, next: NextFunction) => {
-    // const {
-    //     title,
-    //     category,
-    //     subCategory,
-    //     regularPrice,
-    //     salePrice,
-    //     stock,
-    //     shortDescription,
-    //     description,
-    //     tags,
-    //     warranty,
-    //     slug,
-    //     brand,
-    //     videoUrl,
-    //     cashOnDelivery,
-    //     color,            // <-- See Note 1 below
-    //     sizes,
-    //     specifications,
-    //     images,
-    //     properties,     // <-- See Note 2 below
-    //     discountCodes
-    // } = req.body;
+    const {
+        title,
+        category,
+        subCategory,
+        regularPrice,
+        salesPrice,
+        stock,
+        shortDescription,
+        description,
+        tags,
+        warranty,
+        slug,
+        brand,
+        videoUrl,
+        cashOnDelivery,
+        color,            // <-- See Note 1 below
+        sizes,
+        customSpecifications,
+        images,shopId,
+        customProperties,     // <-- See Note 2 below
+        discountCodes
+    } = req.body;
 
+    if (!title || !slug || !category || !stock || !tags || !images ||!tags||!sizes||
+        !subCategory || !regularPrice || !salesPrice || !description||!shopId){
+        throw new ValidationError("All fields are required")}
 
+        const newProduct=await prisma.product.create({
+            data:{title ,slug , category ,stock , tags ,sizes,color,discountCodes,shopId, images,subCategory ,regularPrice,salesPrice ,description,shortDescription}
+        })
 
 })
 
 //upload product image
-export const uploadProductImage=asyncError(async (req:Request,res:Response,next:NextFunction)=>{
-const {fileName}=req.body
-const response=await imageKit.upload({
-    file:fileName,
-    fileName:`product-${Date.now()}.jpg`,
-    folder:'/products'
+export const uploadProductImage = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { fileName } = req.body
+    const response = await imageKit.upload({
+        file: fileName,
+        fileName: `product-${Date.now()}.jpg`,
+        folder: '/products'
+    })
+
+    if (!response) return
+    res.status(201).json({ success: true, file_url: response.url, fileId: response.fileId })
+
 })
 
-if(!response)return 
-res.status(201).json({success:true,file_url:response.url,fileId:response.fileId})
+export const deleteProductImage = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { fileId } = req.body
+    const response = await imageKit.deleteFile(fileId)
 
-})
-
-export const deleteProductImage=asyncError(async (req:Request,res:Response,next:NextFunction)=>{
-const {fileId}=req.body
-const response =await imageKit.deleteFile(fileId)
-
-if(!response)return 
-res.status(201).json({success:true,response})
+    if (!response) return
+    res.status(201).json({ success: true, response })
 
 })

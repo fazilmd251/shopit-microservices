@@ -161,7 +161,7 @@ const ProductBasicInfo: React.FC<ProductBasicInfoProps> = () => {
           <label>Sale Price (Optional)</label>
           <input
             type="number"
-            {...register("salePrice", {
+            {...register("salesPrice", {
               valueAsNumber: true,
               min: { value: 0, message: "Price must be 0 or more" },
               validate: (salePrice) => {

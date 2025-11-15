@@ -4,6 +4,7 @@ import axiosInstance from '../utils/axiosinstance'
 
 const fetchSeller = async () => {
     const response = await axiosInstance.get('/auth/api/logged-in-seller')
+    console.log(response.data.seller)
     return response.data.seller
 }
 
