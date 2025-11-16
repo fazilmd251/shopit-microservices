@@ -138,10 +138,10 @@ export const createProduct = asyncError(async (req: any, res: Response, next: Ne
 });
 
 export const getProducts = asyncError(async (req: any, res: Response, next: NextFunction) => {
-const products:any=await prisma.product.findMany({
-where:{shopId:req.seller?.shop.id},include:{images:true}
-})
-    if (!products&&products.length<1) throw new NotFoundError("Products Not found ");
+    const products: any = await prisma.product.findMany({
+        where: { shopId: req.seller?.shop.id }, include: { images: true }
+    })
+    if (!products && products.length < 1) throw new NotFoundError("Products Not found ");
 
     res.status(200).json({ success: true, products });
 });
@@ -161,11 +161,71 @@ export const uploadProductImage = asyncError(async (req: Request, res: Response,
 
 })
 
+//delete product image
 export const deleteProductImage = asyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { fileId } = req.body
     const response = await imageKit.deleteFile(fileId)
 
     if (!response) return
     res.status(201).json({ success: true, response })
+
+})
+
+//delete product
+export const deleteProduct = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { productId } = req.params
+    const sellerId = (req.seller as any)?.shop?.id
+    const product = await prisma.product.findUnique({
+        where: { id: productId }, select: { id: true, shopId: true, isDeleted: true }
+    })
+
+    if (!product) throw new ValidationError("Product not found")
+
+    if (product.shopId != sellerId) throw new ValidationError("Unauthourized actions")
+
+    if (product.isDeleted) throw new ValidationError("Product is already deleted")
+
+    const deletedProduct = await prisma.product.update({
+        where: { id: productId },
+        data: {
+            isDeleted: true,
+            deletedAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        }
+    })
+
+    res.status(201).json({
+        message:"product is scheduled for deletion in 24 hours.you can restore it within this",
+        deletedAt:deletedProduct.deletedAt
+     })
+
+})
+
+//delete product
+export const restoreProduct = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { productId } = req.params
+    const sellerId = (req.seller as any)?.shop?.id
+    const product = await prisma.product.findUnique({
+        where: { id: productId }, select: { id: true, shopId: true, isDeleted: true }
+    })
+
+    if (!product) throw new ValidationError("Product not found")
+
+    if (product.shopId != sellerId) throw new ValidationError("Unauthourized actions")
+
+    if (!product.isDeleted) return res.status(400).json({message:"Product is not in deleted state"})
+
+    const restoredProduct = await prisma.product.update({
+        where: { id: productId },
+        data: {
+            isDeleted: false,
+            deletedAt: null
+        }
+    })
+
+    if(!restoredProduct)return res.status(400).json({message:"product restoration failde"})
+
+    res.status(201).json({
+        message:"product succesflly restored",
+     })
 
 })
