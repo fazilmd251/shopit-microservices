@@ -1,0 +1,35 @@
+{
+  "name": "user-ui-main",
+  "projectType": "application",
+  "sourceRoot": "apps/user-ui-main/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/user-ui-main"
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "options": {
+        "buildTarget": "user-ui-main:build",
+        "dev": true,
+        "port": 4400
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "user-ui-main:build:production",
+          "dev": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/user-ui-main/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  },
+  "tags": []
+}

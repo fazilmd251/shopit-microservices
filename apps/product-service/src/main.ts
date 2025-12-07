@@ -1,12 +1,12 @@
 import express from 'express'
 import cors from 'cors'
+import './jobs/productCrone.jobs'
 import { errorMiddleware } from '@packages/middlewares/errorMiddleware'
 import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
 import route from './routes/product.routes'
-// import swaggerUi from 'swagger-ui-express'
-//import bodyparser from 'body'
-// const swaggerDocument=require('./swagger-output.json')
+import swaggerUi from 'swagger-ui-express'
+const swaggerDocument=require('./swagger-output.json')
 dotenv.config()
 
 const app = express()
@@ -25,10 +25,10 @@ app.get('/', (req, res) => {
   res.send({ 'message': 'Hello API from Product service' });
 })
 
-// app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerDocument))
-// app.get('/docs-json',(req,res)=>{
-//   res.json(swaggerDocument)
-// })
+app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerDocument))
+app.get('/docs-json',(req,res)=>{
+  res.json(swaggerDocument)
+})
 
 //Routes
 app.use('/api',route)
@@ -39,7 +39,7 @@ const port = Number(process.env.PRODUCT_SERVICE_PORT) || 5050
 
 const server = app.listen(port, () => {
   console.log(`product service is running at http://localhost:${port}/api`)
-  // console.log(`Swagger docs availible at http://localhost:${port}/docs`)
+   console.log(`Swagger docs availible at http://localhost:${port}/docs`)
 })
 
 server.on('error', (err)=>{

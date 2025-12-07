@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono ,Poppins,Roboto} from "next/font/google";
-import "./global.css";
-import Header from "./shared/widgets/header/Header";
+import "./css/global.css";
+import './css/euclid-circular-a-font.css';
 import Providers from "./Providers";
+import Header from "../components/header/Header";
 
 export const metadata :Metadata= {
   title: 'Shopit',
@@ -26,9 +27,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${poppins.variable}`}>
+      <body >
          <Providers>
         <Header/>
         {children}
