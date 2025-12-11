@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import Home from "../components/home/Home"
 
 export const metadata :Metadata= {
   title: 'Shopit',
@@ -7,7 +8,9 @@ export const metadata :Metadata= {
 
 const page = () => {
   return (
-    <div className="text-3xl font-bold">page</div>
+    <>
+    <Home/>
+    </>
   )
 }
 

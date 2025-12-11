@@ -1,27 +1,36 @@
 import React from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
+
 import Image from "next/image";
+import { useStore } from "apps/user-ui/src/store/store";
+import useLocationTracking from "apps/user-ui/src/hooks/useLocationTracking";
+import useDeviceTracking from "apps/user-ui/src/hooks/useDeviceTracking";
+import useUser from "apps/user-ui/src/hooks/useUser";
 
-const SingleItem = ({ item, removeItemFromCart }) => {
-  const dispatch = useDispatch<AppDispatch>();
+const SingleItem = ({ item }: { item: any }) => {
 
+  const {  removeFromCart } = useStore()
+  const location = useLocationTracking()
+  const deviceInfo = useDeviceTracking()
+  const { user } = useUser()
   const handleRemoveFromCart = () => {
-    dispatch(removeItemFromCart(item.id));
+    removeFromCart(item.id, user, location, deviceInfo)
   };
-
+console.log(item)
   return (
     <div className="flex items-center justify-between gap-5">
       <div className="w-full flex items-center gap-6">
         <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5">
-          <Image src={item.imgs?.thumbnails[0]} alt="product" width={100} height={100} />
-        </div>
+          <img
+            src={item&&item.images[0]?.file_url}
+            alt="product"
+            className="w-24 h-24 object-cover block"
+          />        </div>
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
-            <a href="#"> {item.title} </a>
+            <a href="#"> {item?.title} </a>
           </h3>
-          <p className="text-custom-sm">Price: ${item.discountedPrice}</p>
+          <p className="text-custom-sm">Price: ${item?.salesPrice.toFixed(2)}</p>
         </div>
       </div>
 

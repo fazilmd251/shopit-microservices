@@ -1,27 +1,33 @@
 "use client";
-import React, { useEffect, useState } from "react";
 
-import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
-import {
-  removeItemFromCart,
-  selectTotalPrice,
-} from "@/redux/features/cart-slice";
-import { useAppSelector } from "@/redux/store";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
 import SingleItem from "./SingleItem";
 import Link from "next/link";
 import EmptyCart from "./EmptyCart";
+import { useCartModalContext } from "../../../app/context/CartSidebarModalContext";
+import { useStore } from "apps/user-ui/src/store/store";
+import useLocationTracking from "apps/user-ui/src/hooks/useLocationTracking";
+import useDeviceTracking from "apps/user-ui/src/hooks/useDeviceTracking";
+import useUser from "apps/user-ui/src/hooks/useUser";
+
+// Temporary types – adjust to your real cart item type
+type CartItem = any;
+
+
 
 const CartSidebarModal = () => {
   const { isCartModalOpen, closeCartModal } = useCartModalContext();
-  const cartItems = useAppSelector((state) => state.cartReducer.items);
+  const { cart } = useStore()
+  const location = useLocationTracking()
+  const deviceInfo = useDeviceTracking()
+  const { user } = useUser()
 
-  const totalPrice = useSelector(selectTotalPrice);
+  const totalPrice = cart.reduce((total, crt) => total + (crt?.salesPrice * (crt?.quantity??1)), 0);
 
+  //console.log(cart)
   useEffect(() => {
-    // closing modal while clicking outside
-    function handleClickOutside(event) {
-      if (!event.target.closest(".modal-content")) {
+    function handleClickOutside(event: MouseEvent) {
+      if (!(event.target as HTMLElement).closest(".modal-content")) {
         closeCartModal();
       }
     }
@@ -37,9 +43,8 @@ const CartSidebarModal = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 z-99999 overflow-y-auto no-scrollbar w-full h-screen bg-dark/70 ease-linear duration-300 ${
-        isCartModalOpen ? "translate-x-0" : "translate-x-full"
-      }`}
+      className={`fixed top-0 left-0 z-99999 overflow-y-auto no-scrollbar w-full h-screen bg-dark/70 ease-linear duration-300 ${isCartModalOpen ? "translate-x-0" : "translate-x-full"
+        }`}
     >
       <div className="flex items-center justify-end">
         <div className="w-full max-w-[500px] shadow-1 bg-white px-4 sm:px-7.5 lg:px-11 relative modal-content">
@@ -48,7 +53,7 @@ const CartSidebarModal = () => {
               Cart View
             </h2>
             <button
-              onClick={() => closeCartModal()}
+              onClick={closeCartModal}
               aria-label="button for close modal"
               className="flex items-center justify-center ease-in duration-150 bg-meta text-dark-5 hover:text-dark"
             >
@@ -76,13 +81,11 @@ const CartSidebarModal = () => {
 
           <div className="h-[66vh] overflow-y-auto no-scrollbar">
             <div className="flex flex-col gap-6">
-              {/* <!-- cart item --> */}
-              {cartItems.length > 0 ? (
-                cartItems.map((item, key) => (
+              {cart && cart?.length > 0 ? (
+                cart?.map((item, key) => (
                   <SingleItem
                     key={key}
                     item={item}
-                    removeItemFromCart={removeItemFromCart}
                   />
                 ))
               ) : (
@@ -95,12 +98,14 @@ const CartSidebarModal = () => {
             <div className="flex items-center justify-between gap-5 mb-6">
               <p className="font-medium text-xl text-dark">Subtotal:</p>
 
-              <p className="font-medium text-xl text-dark">${totalPrice}</p>
+              <p className="font-medium text-xl text-dark">
+                ${totalPrice}
+              </p>
             </div>
 
             <div className="flex items-center gap-4">
               <Link
-                onClick={() => closeCartModal()}
+                onClick={closeCartModal}
                 href="/cart"
                 className="w-full flex justify-center font-medium text-white bg-blue py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-blue-dark"
               >

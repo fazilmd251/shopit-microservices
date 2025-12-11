@@ -2,7 +2,9 @@ import { NotFoundError, ValidationError } from '@packages/errorHandler/errorHand
 import imageKit from '@packages/libs/imagekit/imageKit'
 import prisma from '@packages/libs/prisma/prisma'
 import asyncError from '@packages/middlewares/asyncError'
+import { Prisma } from '@prisma/client'
 import { NextFunction, Request, response, Response } from 'express'
+import { cursorTo } from 'readline'
 
 //Get categories
 export const getCategories = asyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -194,9 +196,9 @@ export const deleteProduct = asyncError(async (req: Request, res: Response, next
     })
 
     res.status(201).json({
-        message:"product is scheduled for deletion in 24 hours.you can restore it within this",
-        deletedAt:deletedProduct.deletedAt
-     })
+        message: "product is scheduled for deletion in 24 hours.you can restore it within this",
+        deletedAt: deletedProduct.deletedAt
+    })
 
 })
 
@@ -212,7 +214,7 @@ export const restoreProduct = asyncError(async (req: Request, res: Response, nex
 
     if (product.shopId != sellerId) throw new ValidationError("Unauthourized actions")
 
-    if (!product.isDeleted) return res.status(400).json({message:"Product is not in deleted state"})
+    if (!product.isDeleted) return res.status(400).json({ message: "Product is not in deleted state" })
 
     const restoredProduct = await prisma.product.update({
         where: { id: productId },
@@ -222,10 +224,56 @@ export const restoreProduct = asyncError(async (req: Request, res: Response, nex
         }
     })
 
-    if(!restoredProduct)return res.status(400).json({message:"product restoration failde"})
+    if (!restoredProduct) return res.status(400).json({ message: "product restoration failde" })
 
     res.status(201).json({
-        message:"product succesflly restored",
-     })
+        message: "product succesflly restored",
+    })
+
+})
+
+
+//get all products 
+export const getAllProduts = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 20
+    const skip = (page - 1) * limit
+    const type = req.query.type
+
+    const baseFilter = {
+        OR: [{ startingDate: null }, { startingDate: { isSet: false } },
+        { endingDate: null }, { endingDate: { isSet: false } },]
+    }
+    const orderBy: Prisma.productOrderByWithRelationInput = type === 'latest' ?
+        { createdAt: "desc" as Prisma.SortOrder } : { createdAt: "asc" as Prisma.SortOrder }
+
+    const [products, total, top10Products] = await Promise.all([
+        prisma.product.findMany({
+            skip,
+            take: limit,
+            where: baseFilter,
+            include: {
+                images: true, Shop: true
+            },
+            orderBy
+            // orderBy:{
+            //     totalSales:"desc"
+            // }
+        }),
+        prisma.product.count({ where: baseFilter }),
+        prisma.product.findMany({ where: baseFilter, take: 10, orderBy })//add total sales field in this
+    ])
+
+
+    if (products?.length < 1) throw new NotFoundError("Products not found")
+
+    return res.status(201).json({
+        products,
+        top10By: type === 'latest' ? 'latest' : 'topSales',
+        top10Products,
+        total,
+        curtentPage: page,
+        totalPages: Math.ceil(total / limit)
+    })
 
 })

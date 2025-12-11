@@ -11,6 +11,16 @@ const nextConfig = {
   // Use this to set Nx-specific options
   // See: https://nx.dev/recipes/next/next-config-setup
   nx: {},
+  //   images: {
+  //   remotePatterns: [
+  //     {
+  //       protocol: "https",
+  //       hostname: "ik.imagekit.io",
+  //       port: "",
+  //       pathname: "/shopit/apps/user-ui/**", // or "/**" if you want all paths
+  //     },
+  //   ],
+  // },
 };
 
 const plugins = [

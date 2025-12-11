@@ -1,0 +1,29 @@
+{
+  "name": "@shopit/kafka-service",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@shopit/kafka-service:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@shopit/kafka-service:build:development"
+          },
+          "production": {
+            "buildTarget": "@shopit/kafka-service:build:production"
+          }
+        }
+      }
+    }
+  }
+}
