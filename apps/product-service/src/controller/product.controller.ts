@@ -277,3 +277,218 @@ export const getAllProduts = asyncError(async (req: Request, res: Response, next
     })
 
 })
+
+//get product details
+export const getProductDetails = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const product = await prisma.product.findUnique({
+        where: { slug: req.params.slug }, include: { images: true, Shop: true }
+    })
+
+    if (!product) throw new ValidationError("Product not found")
+
+    return res.status(201).json({
+        succes: true,
+        product
+    })
+
+})
+
+//get filtered product 
+export const getFilteredProduct = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const {
+        priceRange = [1, 10000],
+        categories = [],
+        page = 1,
+        colors = [],
+        sizes = [],
+        limit = 12
+    } = req.query
+
+    const parsedPriceRange = typeof priceRange === 'string' ? priceRange.split(",").map(Number) : [1, 10000]
+    const parsedPage = Number(page)
+    const parsedLimit = Number(limit)
+    const skip = (parsedPage - 1) * parsedLimit
+
+    const filters: Record<string, any> = {
+        salesPrice: {
+            gte: parsedPriceRange[0],
+            lte: parsedPriceRange[1]
+        },
+        starting_date: null
+    }
+
+    if (categories && (categories as string[]).length > 0) {
+        filters.category = {
+            in: Array.isArray(categories) ? categories : String(categories).split(",")
+        }
+    }
+    if (sizes && (sizes as string[]).length > 0) {
+        filters.sizes = {
+            hasSome: Array.isArray(sizes) ? sizes : [sizes]
+        }
+    }
+    if (colors && (colors as string[]).length > 0) {
+        filters.colors = {
+            hasSome: Array.isArray(colors) ? colors : [colors]
+        }
+    }
+    const [products, total] = await Promise.all([
+        prisma.product.findMany({
+            where: filters,
+            skip,
+            take: parsedLimit,
+            include: {
+                images: true,
+                Shop: true
+            }
+        }),
+        prisma.product.count({ where: filters })
+    ])
+
+    const totalPages = Math.ceil(total / parsedLimit)
+    if (!products) throw new ValidationError("Product not found")
+
+    return res.status(201).json({
+        succes: true,
+        products,
+        pagination: {
+            total,
+            page: parsedPage,
+            totalPages
+        }
+    })
+
+})
+
+//get filtered offers 
+export const getFilteredEvents = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const {
+        priceRange = [1, 10000],
+        categories = [],
+        page = 1,
+        colors = [],
+        sizes = [],
+        limit = 12
+    } = req.query
+
+    const parsedPriceRange = typeof priceRange === 'string' ? priceRange.split(",").map(Number) : [1, 10000]
+    const parsedPage = Number(page)
+    const parsedLimit = Number(limit)
+    const skip = (parsedPage - 1) * parsedLimit
+
+    const filters: Record<string, any> = {
+        salesPrice: {
+            gte: parsedPriceRange[0],
+            lte: parsedPriceRange[1]
+        },
+        NOT:{starting_date: null}
+    }
+
+    if (categories && (categories as string[]).length > 0) {
+        filters.category = {
+            in: Array.isArray(categories) ? categories : String(categories).split(",")
+        }
+    }
+    if (sizes && (sizes as string[]).length > 0) {
+        filters.sizes = {
+            hasSome: Array.isArray(sizes) ? sizes : [sizes]
+        }
+    }
+    if (colors && (colors as string[]).length > 0) {
+        filters.colors = {
+            hasSome: Array.isArray(colors) ? colors : [colors]
+        }
+    }
+    const [products, total] = await Promise.all([
+        prisma.product.findMany({
+            where: filters,
+            skip,
+            take: parsedLimit,
+            include: {
+                images: true,
+                Shop: true
+            }
+        }),
+        prisma.product.count({ where: filters })
+    ])
+
+    const totalPages = Math.ceil(total / parsedLimit)
+    if (!products) throw new ValidationError("Product not found")
+
+    return res.status(201).json({
+        succes: true,
+        products,
+        pagination: {
+            total,
+            page: parsedPage,
+            totalPages
+        }
+    })
+
+})
+
+
+//get filtered shops 
+export const getFilteredShops = asyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const {
+        categories = [],
+        page = 1,
+        countries = [],
+        limit = 12
+    } = req.query
+
+    const parsedPriceRange = typeof priceRange === 'string' ? priceRange.split(",").map(Number) : [1, 10000]
+    const parsedPage = Number(page)
+    const parsedLimit = Number(limit)
+    const skip = (parsedPage - 1) * parsedLimit
+
+    const filters: Record<string, any> = {
+        salesPrice: {
+            gte: parsedPriceRange[0],
+            lte: parsedPriceRange[1]
+        },
+        NOT:{starting_date: null}
+    }
+
+    if (categories && (categories as string[]).length > 0) {
+        filters.category = {
+            in: Array.isArray(categories) ? categories : String(categories).split(",")
+        }
+    }
+    if (sizes && (sizes as string[]).length > 0) {
+        filters.sizes = {
+            hasSome: Array.isArray(sizes) ? sizes : [sizes]
+        }
+    }
+    if (colors && (colors as string[]).length > 0) {
+        filters.colors = {
+            hasSome: Array.isArray(colors) ? colors : [colors]
+        }
+    }
+    const [products, total] = await Promise.all([
+        prisma.product.findMany({
+            where: filters,
+            skip,
+            take: parsedLimit,
+            include: {
+                images: true,
+                Shop: true
+            }
+        }),
+        prisma.product.count({ where: filters })
+    ])
+
+    const totalPages = Math.ceil(total / parsedLimit)
+    if (!products) throw new ValidationError("Product not found")
+
+    return res.status(201).json({
+        succes: true,
+        products,
+        pagination: {
+            total,
+            page: parsedPage,
+            totalPages
+        }
+    })
+
+})

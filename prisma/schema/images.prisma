@@ -1,0 +1,12 @@
+model images {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  file_id   String
+  file_url  String
+  userId    String?  @unique @db.ObjectId
+  user      users?   @relation(fields: [userId], references: [id])
+  shopId    String?  @unique @db.ObjectId
+  shop      shops?   @relation(fields: [shopId], references: [id])
+  product   product? @relation(fields: [productId], references: [id])
+  productId String?  @db.ObjectId
+}
+

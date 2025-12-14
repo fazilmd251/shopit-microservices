@@ -1,0 +1,14 @@
+model seller {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String   @unique
+  phone_number String
+  country      String
+  stripeId     String?
+  password     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // 👇 just reference shops without fields/references (inverse side)
+  shop shops?
+}

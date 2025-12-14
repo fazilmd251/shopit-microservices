@@ -1,0 +1,12 @@
+model shopReviews {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  review    String
+  userId    String   @db.ObjectId
+  user      users    @relation(fields: [userId], references: [id])
+  rating    Float    @default(0)
+  reviews   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shopId    String?  @db.ObjectId
+  shop      shops?   @relation(fields: [shopId], references: [id])
+}

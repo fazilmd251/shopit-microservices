@@ -1,0 +1,20 @@
+model shops {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  bio           String?
+  category      String
+  avatar        images?
+  coverBanner   String?
+  address       String
+  opening_hours String?
+  website       String?
+  socialLinks   Json[]
+  ratings       Float         @default(0)
+  sellerId      String?       @unique @db.ObjectId
+  reviews       shopReviews[]
+  products      product[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  seller seller? @relation(fields: [sellerId], references: [id])
+}

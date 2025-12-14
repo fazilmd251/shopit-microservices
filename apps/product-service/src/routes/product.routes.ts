@@ -1,5 +1,5 @@
 import express, { Router } from 'express'
-import { createDiscountCode, createProduct, deleteDiscountCodes, deleteProduct, deleteProductImage, getAllProduts, getCategories, getDiscountCodes, getProducts, restoreProduct, uploadProductImage } from '../controller/product.controller'
+import { createDiscountCode, createProduct, deleteDiscountCodes, deleteProduct, deleteProductImage, getAllProduts, getCategories, getDiscountCodes, getProductDetails, getProducts, restoreProduct, uploadProductImage } from '../controller/product.controller'
 import isAuthenticated from '@packages/middlewares/isAuthenticated'
 import { isSeller } from '@packages/middlewares/authourizeRole'
 
@@ -14,6 +14,7 @@ route.post('/upload-product-image', isAuthenticated, isSeller, uploadProductImag
 route.post('/create-product', isAuthenticated, isSeller, createProduct)
 route.get('/get-all-products', isAuthenticated, isSeller, getProducts)
 route.get('/get-all-products-user', getAllProduts)
+route.get('/get-product/:slug', getProductDetails)
 route.delete('/delete-product/:productId', isAuthenticated, isSeller, deleteProduct)
 route.put('/restore-product/:productId', isAuthenticated, isSeller, restoreProduct)
 

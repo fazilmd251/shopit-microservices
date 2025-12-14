@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import useUser from 'apps/user-ui/src/hooks/useUser'
-import ProfileIcon from '../../../assets/svgs/profile-icon'
+//import ProfileIcon from '../../../assets/svgs/profile-icon'
 
 const HeaderBottom = () => {
   const [isSticky, setIsSticky] = useState(false)
@@ -49,7 +49,7 @@ const {user,isLoading}=useUser()
             {
           !isLoading&&user?(<div className="flex items-center gap-2">
             <Link href={'/profile'}>
-          <ProfileIcon/>
+         {/* <ProfileIcon/> */}
           </Link>
           <span className="flex flex-col leading-tight">
                 <span className="font-semibold text-xs text-gray-600">hello</span>
@@ -63,7 +63,7 @@ const {user,isLoading}=useUser()
                 alt="profile"
                 className="w-9 h-9 rounded-full border-2 border-blue-400"
               /> */}
-              <ProfileIcon/>
+              {/* <ProfileIcon/> */}
               <span className="flex flex-col leading-tight">
                 <span className="font-semibold text-xs text-gray-600">hello</span>
                 <Link href={isLoading?'/':'/login'} className="font-semibold text-xs text-blue-600">{isLoading?'...':'sign in'}</Link>

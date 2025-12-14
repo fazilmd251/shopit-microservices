@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "mongodb"
+ url      = env("DATABASE_URL")
+}
+
+
+
+
+
+
+
+
+
+//product model
+
+// site config
+
+

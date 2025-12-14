@@ -1,0 +1,51 @@
+model discount_codes {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  public_name   String
+  discountType  String
+  discountValue Float
+  discountCode  String   @unique
+  sellerId      String   @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum productStatus {
+  active
+  pending
+  draft
+}
+
+model product {
+  id                   String        @id @default(auto()) @map("_id") @db.ObjectId
+  title                String
+  description          String
+  shortDescription     String
+  slug                 String        @unique
+  stock                Int
+  images               images[]
+  salesPrice           Float
+  category             String
+  subCategory          String
+  regularPrice         Float
+  tags                 String[]
+  warranty             String?
+  ratings              Float?
+  brand                String?
+  videoUrl             String?
+  cashOnDelivery       String?
+  sizes                String[]
+  color                String[]
+  discountCodes        String[]      @db.ObjectId
+  customSpecifications Json[]
+  customProperties     Json?
+  startingDate         DateTime?
+  //totalSales         DateTime?
+  endingDate           DateTime?
+  status               productStatus @default(active)
+  isDeleted            Boolean       @default(false)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  deletedAt            DateTime?      //@updatedAt
+  shopId               String        @db.ObjectId
+  Shop                 shops         @relation(fields: [shopId], references: [id])
+}
